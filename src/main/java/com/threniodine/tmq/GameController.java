@@ -18,36 +18,35 @@ import reactor.core.publisher.Sinks;
 @RestController
 public class GameController {
 
-    private ArrayList<Messenger> messengers = new ArrayList<Messenger>();
-
-    @Autowired
-    private GameService gameService;
+    private GameService gameService = new GameService();
 
     @CrossOrigin(origins = "http://localhost:3000")
     @PostMapping("/createGame")
-    public Game createGame(){
-        Game answer =  gameService.createGame();
-        messengers.add(answer.getGameId()-1, new Messenger());
-        return answer;
+    public Integer createGame(){
+        return gameService.createGame();
     }
 
     @CrossOrigin(origins = "http://localhost:3000")
-    @GetMapping("/readGame/{id}")
-    public Game readGame(@PathVariable Integer id){
-        return gameService.readGame(id);
+    @GetMapping("/readGameState/{id}")
+    public GameState readGameState(@PathVariable Integer id){
+        return gameService.readGameState(id);
     }
 
     @CrossOrigin(origins = "http://localhost:3000")
-    @PostMapping("/updateGame/{id}")
-    public Game updateGame(@PathVariable Integer id, @RequestBody Game gameChanges){
-        Game result =  gameService.updateGame(id, gameChanges);
-        messengers.get(id-1).getSink().tryEmitNext(gameService.readGame(id));
-        return result;
+    @PostMapping("/updateGameState/{id}")
+    public Boolean updateGameState(@PathVariable Integer id, @RequestBody GameState gameStateChanges){
+        return gameService.updateGameState(id, gameStateChanges);
     }
 
     @CrossOrigin(origins = "http://localhost:3000")
-    @GetMapping(path="/sse/{id}", produces=MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<Game> createConnectionAndSendEvents(@PathVariable Integer id) {
-        return messengers.get(id-1).getFlux();//Flux.just(gameService.readGame(1));
+    @PostMapping("/deleteGame/{id}")
+    public Boolean deleteGame(@PathVariable Integer id){
+        return gameService.deleteGame(id);
+    }
+
+    @CrossOrigin(origins = "http://localhost:3000")
+    @GetMapping(path="/subscribeGame/{id}", produces=MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<GameState> subscribeGame(@PathVariable Integer id) {
+        return gameService.subscribeGame(id);
     }
 }
