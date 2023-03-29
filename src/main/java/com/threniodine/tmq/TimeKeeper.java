@@ -37,6 +37,8 @@ public class TimeKeeper {
         timer.scheduleAtFixedRate(new CountTask(), 0, 1000);
     }
 
-
+    public void cancelTimer(){
+        this.timer.cancel();
+    }
 
 }
