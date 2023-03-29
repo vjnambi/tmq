@@ -6,8 +6,8 @@ import reactor.core.publisher.Sinks;
 
 @Data
 public class Messenger {
-    private Sinks.Many<GameState> sink;
-    private Flux<GameState> flux;
+    private Sinks.Many<Game> sink;
+    private Flux<Game> flux;
 
     public Messenger(){
         sink = Sinks.many().multicast().onBackpressureBuffer();

@@ -13,11 +13,11 @@ public class TimeKeeper {
     @JsonIgnore
     private Timer timer;
     @JsonIgnore
-    private GameState parentGameState;
+    private Game parentGame;
 
-    public TimeKeeper(GameState parentGameState){
+    public TimeKeeper(Game parentGame){
         this.time = 0;
-        this.parentGameState = parentGameState;
+        this.parentGame = parentGame;
     }
 
     class CountTask extends TimerTask {
@@ -25,9 +25,9 @@ public class TimeKeeper {
             time = time - 1;
             if(time <= 0){
                 timer.cancel();
-                parentGameState.transition();
+                parentGame.transition();
             }
-            parentGameState.getParentMessenger().getSink().tryEmitNext(parentGameState);
+            parentGame.getMessenger().getSink().tryEmitNext(parentGame);
         }
     }
 
