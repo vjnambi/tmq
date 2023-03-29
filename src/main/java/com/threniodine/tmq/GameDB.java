@@ -7,5 +7,9 @@ import lombok.Data;
 
 @Data
 public class GameDB{
-    private Map<Integer, Game> gameMap = new HashMap<Integer, Game>();
+    private Map<Integer, Game> gameMap;
+
+    public GameDB(){
+        this.gameMap = new HashMap<Integer, Game>();
+    }
 }

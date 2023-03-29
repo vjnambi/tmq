@@ -1,24 +1,31 @@
 package com.threniodine.tmq;
 
 import java.util.Objects;
+import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.messaging.handler.annotation.SendTo;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class Game {
+    static AtomicInteger nextGameId = new AtomicInteger(0);
 
     private Integer gameId;
-    @Builder.Default
-    private GameState gameState = new GameState();
-    @Builder.Default
-    private Messenger messenger = new Messenger();
+    private GameState gameState;
+    private Messenger messenger;
+
+    public Game(){
+        this.gameId = nextGameId.incrementAndGet();
+        this.messenger = new Messenger();
+        this.gameState = new GameState(this.messenger);
+        
+    }
+
+    public void publishGameState(){
+        getMessenger().getSink().tryEmitNext(gameState);
+    }
+
 
 }

@@ -27,17 +27,31 @@ public class GameController {
     }
 
     @CrossOrigin(origins = "http://localhost:3000")
-    @GetMapping("/readGameState/{id}")
-    public GameState readGameState(@PathVariable Integer id){
-        return gameService.readGameState(id);
+    @GetMapping("/readGameState/{gameId}")
+    public GameState readGameState(@PathVariable Integer gameId){
+        return gameService.readGameState(gameId);
     }
 
+    @CrossOrigin(origins = "http://localhost:3000")
+    @PostMapping("/addPlayer/{gameId}")
+    public Integer addPlayer(@PathVariable Integer gameId, @RequestBody StringContainer stringContainer){
+        String playerName = stringContainer.payload;
+        return gameService.addPlayer(gameId, playerName);
+    }
+
+    @CrossOrigin(origins = "http://localhost:3000")
+    @PostMapping("/updatePlayerAnswer/{gameId}/{playerId}")
+    public Boolean updatePlayerAnswer(@PathVariable Integer gameId, @PathVariable Integer playerId, @RequestBody StringContainer stringContainer){
+        String playerAnswer = stringContainer.payload;
+        return gameService.updatePlayerAnswer(gameId, playerId, playerAnswer);
+    }
+    /*
     @CrossOrigin(origins = "http://localhost:3000")
     @PostMapping("/updateGameState/{id}")
     public Boolean updateGameState(@PathVariable Integer id, @RequestBody GameState gameStateChanges){
         return gameService.updateGameState(id, gameStateChanges);
     }
-
+    */
     @CrossOrigin(origins = "http://localhost:3000")
     @PostMapping("/deleteGame/{id}")
     public Boolean deleteGame(@PathVariable Integer id){
