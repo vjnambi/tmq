@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.threniodine</groupId>
-	<artifactId>tmq</artifactId>
+	<artifactId>thrensmusicquizapi</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>tmq</name>
+	<name>thrensmusicquizapi</name>
 	<description>Thren&apos;s Music Quiz</description>
 	<properties>
 		<java.version>17</java.version>
