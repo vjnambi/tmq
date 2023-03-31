@@ -1,6 +1,8 @@
 package com.threniodine.tmq;
 
+import java.util.ArrayList;
 import java.util.Objects;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -16,7 +18,9 @@ public class Game {
     private String gameName;
     private Player[] playerList;
     @JsonIgnore
-    private Question[] questionList;
+    private ArrayList<Question> questionPool;
+    @JsonIgnore
+    private ArrayList<Question> questionList;
     private Integer currentQuestionNum;
     private Question currentQuestion;
     private String status;
@@ -40,11 +44,8 @@ public class Game {
         for(int i = 0; i < 4; i++){
             playerListAvailability[i] = new AtomicBoolean(false);
         }
-
-        questionList = new Question[10];
-        for(int i = 0; i < 10; i++){
-            questionList[i] = new Question();
-        }
+        questionPool = new ArrayList<Question>();
+        questionList = new ArrayList<Question>();
         currentQuestionNum = 0;
         status = "lobby";
 
@@ -58,6 +59,22 @@ public class Game {
             }
         }
         return -1;
+    }
+
+    public Boolean addQuestionSet(ArrayList<Question> qs){
+        Boolean b = true;
+        int s = qs.size();
+        for(int i = 0; i < s; i++){
+            if(!addQuestion(qs.get(i))){
+                b = false;
+            }
+        }
+        return b;
+    }
+
+    public Boolean addQuestion(Question q){
+        questionPool.add(q);
+        return true;
     }
 
     public Boolean updatePlayerAnswer(Integer playerId, String playerAnswer){
@@ -111,7 +128,7 @@ public class Game {
         Player p;
         for(int i = 0; i < 4; i++){
             p = playerList[i];
-            if(Objects.nonNull(p) && p.getAnswer().equals(correctAnswer)){
+            if(Objects.nonNull(p) && p.getAnswer().equalsIgnoreCase(correctAnswer)){
                 p.setScore(p.getScore() + 1);
             }
         }
@@ -126,11 +143,11 @@ public class Game {
                 p.setAnswer("");
             }
         }
-        if(currentQuestionNum == 10){
+        if(currentQuestionNum == questionList.size()){
             status = "result";
         } else {
             currentQuestionNum++;
-            currentQuestion = questionList[currentQuestionNum-1];
+            currentQuestion = questionList.get(currentQuestionNum-1);
             timeKeeper.startTimer(15);
             status = "question";
         }
@@ -148,10 +165,19 @@ public class Game {
         timeKeeper.cancelTimer();
     }
 
+    public void populateQuestionList(){
+        Random r = new Random();
+        int s = questionPool.size();
+        for(int i = 0; i < 10; i++){
+            questionList.add(questionPool.get(r.nextInt(s)));
+        }
+    }
+
     public void transition(){
         if(status.equals("lobby")){
             Boolean allReady = checkAllPlayers("ready");
             if(allReady){
+                populateQuestionList();
                 transitionNextQuestion();
             }
         } else if(status.equals("question")){

@@ -1,5 +1,6 @@
 package com.threniodine.tmq;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 import reactor.core.publisher.Flux;
@@ -31,6 +32,16 @@ public class GameService {
             g.publishGame();
         }
         return i;
+    }
+
+    public Boolean addQuestionSet(Integer gameId, ArrayList<Question> questionSet){
+        Game g = readGame(gameId);
+        Boolean b = g.addQuestionSet(questionSet);
+        if(b){
+            g.transition();
+            g.publishGame();
+        }
+        return b;
     }
 
     public Boolean updatePlayerAnswer(Integer gameId, Integer playerId, String playerAnswer){

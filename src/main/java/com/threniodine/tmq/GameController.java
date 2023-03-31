@@ -1,6 +1,8 @@
 package com.threniodine.tmq;
 
 
+import java.util.ArrayList;
+
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,6 +35,19 @@ public class GameController {
     public Integer addPlayer(@PathVariable Integer gameId, @RequestBody StringContainer stringContainer){
         String playerName = stringContainer.payload;
         return gameService.addPlayer(gameId, playerName);
+    }
+
+    @CrossOrigin
+    @PostMapping("/addQuestionSet/{gameId}")
+    public Boolean addQuestionSet(@PathVariable Integer gameId, @RequestBody QuestionSetContainer qsContainer){
+        System.out.println(qsContainer.payload[0].url);
+        QuestionContainer qContainer;
+        ArrayList<Question> questionSet = new ArrayList<Question>();
+        for(int i = 0; i < qsContainer.payload.length; i++){
+            qContainer = qsContainer.payload[i];
+            questionSet.add(new Question(qContainer));
+        }
+        return gameService.addQuestionSet(gameId, questionSet);
     }
 
     @CrossOrigin
