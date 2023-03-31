@@ -16,30 +16,37 @@ public class GameController {
 
     private GameService gameService = new GameService();
 
-    @CrossOrigin(origins = "http://localhost:3000")
+    @CrossOrigin
     @PostMapping("/createGame")
     public Integer createGame(){
         return gameService.createGame();
     }
 
-    @CrossOrigin(origins = "http://localhost:3000")
+    @CrossOrigin
     @GetMapping("/readGame/{gameId}")
     public Game readGame(@PathVariable Integer gameId){
         return gameService.readGame(gameId);
     }
 
-    @CrossOrigin(origins = "http://localhost:3000")
+    @CrossOrigin
     @PostMapping("/addPlayer/{gameId}")
     public Integer addPlayer(@PathVariable Integer gameId, @RequestBody StringContainer stringContainer){
         String playerName = stringContainer.payload;
         return gameService.addPlayer(gameId, playerName);
     }
 
-    @CrossOrigin(origins = "http://localhost:3000")
+    @CrossOrigin
     @PostMapping("/updatePlayerAnswer/{gameId}/{playerId}")
     public Boolean updatePlayerAnswer(@PathVariable Integer gameId, @PathVariable Integer playerId, @RequestBody StringContainer stringContainer){
         String playerAnswer = stringContainer.payload;
         return gameService.updatePlayerAnswer(gameId, playerId, playerAnswer);
+    }
+
+    @CrossOrigin
+    @PostMapping("/updatePlayerStatus/{gameId}/{playerId}")
+    public Boolean updatePlayerStatus(@PathVariable Integer gameId, @PathVariable Integer playerId, @RequestBody StringContainer stringContainer){
+        String playerStatus = stringContainer.payload;
+        return gameService.updatePlayerStatus(gameId, playerId, playerStatus);
     }
     /*
     @CrossOrigin(origins = "http://localhost:3000")
@@ -48,13 +55,13 @@ public class GameController {
         return gameService.updateGameState(id, gameStateChanges);
     }
     */
-    @CrossOrigin(origins = "http://localhost:3000")
+    @CrossOrigin
     @PostMapping("/deleteGame/{id}")
     public Boolean deleteGame(@PathVariable Integer id){
         return gameService.deleteGame(id);
     }
 
-    @CrossOrigin(origins = "http://localhost:3000")
+    @CrossOrigin
     @GetMapping(path="/subscribeGame/{id}", produces=MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<Game> subscribeGame(@PathVariable Integer id) {
         return gameService.subscribeGame(id);

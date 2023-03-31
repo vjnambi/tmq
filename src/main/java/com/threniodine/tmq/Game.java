@@ -63,11 +63,15 @@ public class Game {
     public Boolean updatePlayerAnswer(Integer playerId, String playerAnswer){
         Player p = playerList[playerId-1];
         p.setAnswer(playerAnswer);
-        if(playerAnswer.compareToIgnoreCase("ready") == 0 || playerAnswer.compareToIgnoreCase("r") == 0){
-            p.setStatus("ready");
-        } else {
+        if(!"".equals(playerAnswer)){
             p.setStatus("answered");
         }
+        return true;
+    }
+
+    public Boolean updatePlayerStatus(Integer playerId, String playerStatus){
+        Player p = playerList[playerId-1];
+        p.setStatus(playerStatus);
         return true;
     }
 

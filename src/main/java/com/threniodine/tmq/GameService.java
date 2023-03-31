@@ -42,6 +42,16 @@ public class GameService {
         }
         return b;
     }
+
+    public Boolean updatePlayerStatus(Integer gameId, Integer playerId, String playerStatus){
+        Game g = readGame(gameId);
+        Boolean b = g.updatePlayerStatus(playerId, playerStatus);
+        if(b){
+            g.transition();
+            g.publishGame();
+        }
+        return b;
+    }
     /*
     public Boolean updateGameState(Integer id, GameState gameStateChanges){
         Boolean b = gameDB.getGameMap().get(id).getGameState().accept(gameStateChanges);
