@@ -1,9 +1,5 @@
 package com.threniodine.tmq;
 
-import java.util.Random;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.Data;
 
 @Data
