@@ -17,14 +17,11 @@ public class Game {
     private Integer gameId;
     private String gameName;
     private Player[] playerList;
-    @JsonIgnore
     private ArrayList<Question> questionPool;
-    @JsonIgnore
     private ArrayList<Question> questionList;
     private Integer currentQuestionNum;
     private Question currentQuestion;
     private String status;
-    @JsonIgnore
     private AtomicBoolean[] playerListAvailability;
     @JsonIgnore
     private Messenger messenger;
@@ -79,17 +76,33 @@ public class Game {
 
     public Boolean updatePlayerAnswer(Integer playerId, String playerAnswer){
         Player p = playerList[playerId-1];
-        p.setAnswer(playerAnswer);
-        if(!"".equals(playerAnswer)){
-            p.setStatus("answered");
+        Boolean b = false;
+        while(p.getLocked().compareAndSet(false, true)){
+
         }
-        return true;
+        if(!"".equals(playerAnswer) && p.getStatus().equals("thinking")){
+            p.setAnswer(playerAnswer);
+            p.setStatus("answered");
+            b = true;
+        }
+        p.getLocked().compareAndSet(true, false);
+        return b;
     }
 
     public Boolean updatePlayerStatus(Integer playerId, String playerStatus){
         Player p = playerList[playerId-1];
-        p.setStatus(playerStatus);
-        return true;
+        Boolean b = false;
+        while(p.getLocked().compareAndSet(false, true)){
+
+        }
+        String s = p.getStatus();
+        if(playerStatus.equals("ready") && s.equals("unready") || playerStatus.equals("unready") && s.equals("ready")){
+            b = true;
+            p.setStatus(playerStatus);
+        }
+        p.getLocked().compareAndSet(true, false);
+
+        return b;
     }
 
     public void publishGame(){
@@ -139,8 +152,13 @@ public class Game {
         for(int i = 0; i < 4; i++){
             p = playerList[i];
             if(Objects.nonNull(p)){
+                while(p.getLocked().compareAndSet(false, true)){
+
+                }
                 p.setStatus("thinking");
                 p.setAnswer("");
+                p.getLocked().compareAndSet(true, false);
+
             }
         }
         if(currentQuestionNum == questionList.size()){
@@ -158,7 +176,12 @@ public class Game {
         for(int i = 0; i < 4; i++){
             p = playerList[i];
             if(Objects.nonNull(p)){
+                while(p.getLocked().compareAndSet(false, true)){
+
+                }
                 p.setStatus("unready");
+                p.getLocked().compareAndSet(true, false);
+
             }
         }
         status = "answer";
