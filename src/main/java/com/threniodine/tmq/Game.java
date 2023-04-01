@@ -111,16 +111,20 @@ public class Game {
 
     public Boolean checkAllPlayers(String checkStatus){
         Boolean b = true;
+        Boolean any = false;
         Player p;
 
         for(int i = 0; i < 4; i++){
             p = playerList[i];
-            if(Objects.nonNull(p) && !p.getStatus().equals(checkStatus)){
-                b = false;
+            if(Objects.nonNull(p)){
+                any = true;
+                if(!p.getStatus().equals(checkStatus)){
+                    b = false;
+                }
             }
         }
 
-        return b;
+        return any && b;
     }
 
     public Boolean checkAnyPlayers(String checkStatus){
