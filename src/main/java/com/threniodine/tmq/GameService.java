@@ -8,13 +8,15 @@ import reactor.core.publisher.Flux;
 public class GameService {
 
     private GameDB gameDB;
+    private GameController gc;
 
-    public GameService() {
+    public GameService(GameController gc) {
+        this.gc = gc;
         this.gameDB = new GameDB();
     }
     
     public Integer createGame(){
-        Game g = new Game();
+        Game g = new Game(gc);
         Integer i = g.getGameId();
         gameDB.getGameMap().put(i, g);
         return i;

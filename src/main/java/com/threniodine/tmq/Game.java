@@ -27,12 +27,16 @@ public class Game {
     @JsonIgnore
     private Messenger messenger;
     private TimeKeeper timeKeeper;
+    @JsonIgnore
+    private GameController gc;
     
 
-    public Game(){
+    public Game(GameController gc){
         this.gameId = nextGameId.incrementAndGet();
 
         this.gameName = "Thren's Music Quiz";
+
+        this.gc = gc;
 
         this.messenger = new Messenger();
         this.timeKeeper = new TimeKeeper(this);
@@ -112,7 +116,7 @@ public class Game {
     }
 
     public void publishGame(){
-        messenger.getSink().tryEmitNext(this);
+        gc.broadcast(this);
     }
 
     public Boolean checkAllPlayers(String checkStatus){

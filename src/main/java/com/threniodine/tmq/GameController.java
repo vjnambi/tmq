@@ -3,7 +3,9 @@ package com.threniodine.tmq;
 
 import java.util.ArrayList;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,8 +17,9 @@ import reactor.core.publisher.Flux;
 
 @RestController
 public class GameController {
-
-    private GameService gameService = new GameService();
+	@Autowired
+	private SimpMessagingTemplate template;
+    private GameService gameService = new GameService(this);
 
     @CrossOrigin
     @PostMapping("/createGame")
@@ -80,5 +83,9 @@ public class GameController {
     @GetMapping(path="/subscribeGame/{id}", produces=MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<Game> subscribeGame(@PathVariable Integer id) {
         return gameService.subscribeGame(id);
+    }
+
+    public void broadcast(Game g){
+        template.convertAndSend("/topic/game/"+g.getGameId(), g);
     }
 }
