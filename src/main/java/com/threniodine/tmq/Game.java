@@ -18,6 +18,7 @@ public class Game {
     private String gameName;
     private Player[] playerList;
     private ArrayList<Question> questionPool;
+    private AtomicBoolean questionPoolLock;
     private ArrayList<Question> questionList;
     private Integer currentQuestionNum;
     private Question currentQuestion;
@@ -42,6 +43,7 @@ public class Game {
             playerListAvailability[i] = new AtomicBoolean(false);
         }
         questionPool = new ArrayList<Question>();
+        questionPoolLock = new AtomicBoolean(false);
         questionList = new ArrayList<Question>();
         currentQuestionNum = 0;
         status = "lobby";
@@ -59,6 +61,9 @@ public class Game {
     }
 
     public Boolean addQuestionSet(ArrayList<Question> qs){
+        while(questionPoolLock.compareAndSet(false, true)){
+
+        }
         Boolean b = true;
         int s = qs.size();
         for(int i = 0; i < s; i++){
@@ -66,6 +71,7 @@ public class Game {
                 b = false;
             }
         }
+        questionPoolLock.compareAndSet(true, false);
         return b;
     }
 
@@ -203,10 +209,14 @@ public class Game {
     public void transition(){
         if(status.equals("lobby")){
             Boolean allReady = checkAllPlayers("ready");
-            if(allReady){
+            while(questionPoolLock.compareAndSet(false, true)){
+
+            }
+            if(allReady && questionPool.size() > 0){
                 populateQuestionList();
                 transitionNextQuestion();
             }
+            questionPoolLock.compareAndSet(true, false);
         } else if(status.equals("question")){
             Boolean AllAnswered = checkAllPlayers("answered");
             if(AllAnswered || timeKeeper.getTime() == 0){
