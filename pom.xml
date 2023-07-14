@@ -97,10 +97,12 @@
 				<version>2.10.0</version>
 			    <configuration>
 			        <schemaVersion>v2</schemaVersion>
-			        <resourceGroup>thrensmusicquizapi-1682105183110-rg</resourceGroup>
-			        <appName>thrensmusicquizapi-1682105183110</appName>
+			        <resourceGroup>tmq-rg</resourceGroup>
+			        <appName>thrensmusicquizgame</appName>
 			        <pricingTier>B1</pricingTier>
-			        <region>centralus</region>
+					<appServicePlanResourceGroup>tmq-rg</appServicePlanResourceGroup>
+          			<appServicePlanName>tmq-asp</appServicePlanName>
+			        <region>eastus</region>
 			        <runtime>
 			            <os>Linux</os>
 			            <javaVersion>Java 17</javaVersion>

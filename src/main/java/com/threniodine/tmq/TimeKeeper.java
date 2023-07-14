@@ -27,7 +27,7 @@ public class TimeKeeper {
                 timer.cancel();
                 parentGame.transition();
             }
-            parentGame.getMessenger().getSink().tryEmitNext(parentGame);
+            parentGame.publishGame();
         }
     }
 
