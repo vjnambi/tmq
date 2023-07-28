@@ -24,8 +24,6 @@ public class Game {
     private Question currentQuestion;
     private String status;
     private AtomicBoolean[] playerListAvailability;
-    @JsonIgnore
-    private Messenger messenger;
     private TimeKeeper timeKeeper;
     @JsonIgnore
     private GameController gc;
@@ -38,7 +36,6 @@ public class Game {
 
         this.gc = gc;
 
-        this.messenger = new Messenger();
         this.timeKeeper = new TimeKeeper(this);
 
         playerList = new Player[4];

@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import reactor.core.publisher.Flux;
-
 @RestController
 public class GameController {
 	@Autowired
@@ -77,12 +75,6 @@ public class GameController {
     @PostMapping("/deleteGame/{id}")
     public Boolean deleteGame(@PathVariable Integer id){
         return gameService.deleteGame(id);
-    }
-
-    @CrossOrigin
-    @GetMapping(path="/subscribeGame/{id}", produces=MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<Game> subscribeGame(@PathVariable Integer id) {
-        return gameService.subscribeGame(id);
     }
 
     public void broadcast(Game g){

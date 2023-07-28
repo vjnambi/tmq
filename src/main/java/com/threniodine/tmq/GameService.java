@@ -65,24 +65,10 @@ public class GameService {
         }
         return b;
     }
-    /*
-    public Boolean updateGameState(Integer id, GameState gameStateChanges){
-        Boolean b = gameDB.getGameMap().get(id).getGameState().accept(gameStateChanges);
-        if(b){
-            Game g = gameDB.getGameMap().get(id);
-            GameState gs = g.getGameState();
-            g.getMessenger().getSink().tryEmitNext(gs);
-        }
-        return b;
-    }
-    */
+
     public Boolean deleteGame(Integer gameId){
         Game g = gameDB.getGameMap().remove(gameId);
         return Objects.nonNull(g);
-    }
-
-    public Flux<Game> subscribeGame(Integer gameId){
-        return readGame(gameId).getMessenger().getFlux();
     }
 
     public void publishGameState(Integer gameId){
