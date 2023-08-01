@@ -40,9 +40,8 @@ public class GameController {
         return gameService.addPlayer(gameId, playerName);
     }
 
-    @CrossOrigin
-    @PostMapping("/addQuestionSet/{gameId}")
-    public Boolean addQuestionSet(@PathVariable Integer gameId, @RequestBody QuestionSetContainer qsContainer){
+    @MessageMapping("/addQuestionSet/{gameId}")
+    public Boolean addQuestionSet(QuestionSetContainer qsContainer, @DestinationVariable Integer gameId){
         System.out.println(qsContainer.payload[0].url);
         QuestionContainer qContainer;
         ArrayList<Question> questionSet = new ArrayList<Question>();
