@@ -63,12 +63,19 @@ public class GameService {
         }
         return b;
     }
-
+    /*
     public Boolean deleteGame(Integer gameId){
         Game g = gameDB.getGameMap().remove(gameId);
         return Objects.nonNull(g);
     }
 
+    public Boolean changeGameTitle(Integer gameId, String title){
+        Game g = readGame(gameId);
+        g.setGameName(title);
+        g.publishGame();
+        return true;
+    }
+    */
     public void publishGameState(Integer gameId){
         readGame(gameId).publishGame();
     }

@@ -5,6 +5,8 @@ import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -51,18 +53,14 @@ public class GameController {
         return gameService.addQuestionSet(gameId, questionSet);
     }
 
-    @CrossOrigin
-    @PostMapping("/updatePlayerAnswer/{gameId}/{playerId}")
-    public Boolean updatePlayerAnswer(@PathVariable Integer gameId, @PathVariable Integer playerId, @RequestBody StringContainer stringContainer){
-        String playerAnswer = stringContainer.payload;
-        return gameService.updatePlayerAnswer(gameId, playerId, playerAnswer);
+    @MessageMapping("/updatePlayerAnswer/{gameId}/{playerId}")
+    public Boolean updatePlayerAnswer(StringContainer stringContainer, @DestinationVariable Integer gameId, @DestinationVariable Integer playerId){
+        return gameService.updatePlayerAnswer(gameId, playerId, stringContainer.payload);
     }
 
-    @CrossOrigin
-    @PostMapping("/updatePlayerStatus/{gameId}/{playerId}")
-    public Boolean updatePlayerStatus(@PathVariable Integer gameId, @PathVariable Integer playerId, @RequestBody StringContainer stringContainer){
-        String playerStatus = stringContainer.payload;
-        return gameService.updatePlayerStatus(gameId, playerId, playerStatus);
+    @MessageMapping("/updatePlayerStatus/{gameId}/{playerId}")
+    public Boolean updatePlayerStatus(StringContainer stringContainer, @DestinationVariable Integer gameId, @DestinationVariable Integer playerId){
+        return gameService.updatePlayerStatus(gameId, playerId, stringContainer.payload);
     }
     /*
     @CrossOrigin(origins = "http://localhost:3000")
@@ -70,13 +68,18 @@ public class GameController {
     public Boolean updateGameState(@PathVariable Integer id, @RequestBody GameState gameStateChanges){
         return gameService.updateGameState(id, gameStateChanges);
     }
-    */
+    
     @CrossOrigin
     @PostMapping("/deleteGame/{id}")
     public Boolean deleteGame(@PathVariable Integer id){
         return gameService.deleteGame(id);
     }
 
+    @MessageMapping("/changeTitle/{id}")
+    public Boolean changeGameTitle(StringContainer stringContainer, @DestinationVariable Integer id){
+        return gameService.changeGameTitle(id,stringContainer.payload);
+    }
+    */
     public void broadcast(Game g){
         template.convertAndSend("/topic/game/"+g.getGameId(), g);
     }
