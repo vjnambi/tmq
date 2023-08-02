@@ -1,6 +1,8 @@
 package com.threniodine.tmq;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -16,14 +18,16 @@ public class Game {
 
     private Integer gameId;
     private String gameName;
-    private Player[] playerList;
+    private AtomicInteger nextPlayerId;
+    private Map<Integer, Player> playerMap;
+    private AtomicBoolean playerMapLock;
     private ArrayList<Question> questionPool;
     private AtomicBoolean questionPoolLock;
     private ArrayList<Question> questionList;
     private Integer currentQuestionNum;
     private Question currentQuestion;
     private String status;
-    private AtomicBoolean[] playerListAvailability;
+   
     private TimeKeeper timeKeeper;
     @JsonIgnore
     private GameController gc;
@@ -38,11 +42,9 @@ public class Game {
 
         this.timeKeeper = new TimeKeeper(this);
 
-        playerList = new Player[4];
-        playerListAvailability = new AtomicBoolean[4];
-        for(int i = 0; i < 4; i++){
-            playerListAvailability[i] = new AtomicBoolean(false);
-        }
+        nextPlayerId = new AtomicInteger(0);
+        playerMap = new HashMap<Integer,Player>();
+
         questionPool = new ArrayList<Question>();
         questionPoolLock = new AtomicBoolean(false);
         questionList = new ArrayList<Question>();
@@ -52,13 +54,9 @@ public class Game {
     }
 
     public Integer addPlayer(String playerName){
-        for(int i = 0; i < 4; i++){
-            if(playerListAvailability[i].compareAndSet(false, true)){
-                playerList[i] = new Player(playerName);
-                return i+1;
-            }
-        }
-        return -1;
+        Integer temp = nextPlayerId.incrementAndGet();
+        playerMap.put(temp,new Player(playerName, temp));
+        return temp;
     }
 
     public Boolean addQuestionSet(ArrayList<Question> qs){
@@ -82,7 +80,7 @@ public class Game {
     }
 
     public Boolean updatePlayerAnswer(Integer playerId, String playerAnswer){
-        Player p = playerList[playerId-1];
+        Player p = playerMap.get(playerId);
         Boolean b = false;
         while(p.getLocked().compareAndSet(false, true)){
 
@@ -97,7 +95,7 @@ public class Game {
     }
 
     public Boolean updatePlayerStatus(Integer playerId, String playerStatus){
-        Player p = playerList[playerId-1];
+        Player p = playerMap.get(playerId);
         Boolean b = false;
         while(p.getLocked().compareAndSet(false, true)){
 
@@ -119,10 +117,8 @@ public class Game {
     public Boolean checkAllPlayers(String checkStatus){
         Boolean b = true;
         Boolean any = false;
-        Player p;
 
-        for(int i = 0; i < 4; i++){
-            p = playerList[i];
+        for(Player p:playerMap.values()){
             if(Objects.nonNull(p)){
                 any = true;
                 if(!p.getStatus().equals(checkStatus)){
@@ -136,10 +132,8 @@ public class Game {
 
     public Boolean checkAnyPlayers(String checkStatus){
         Boolean b = false;
-        Player p;
 
-        for(int i = 0; i < 4; i++){
-            p = playerList[i];
+        for(Player p:playerMap.values()){
             if(Objects.nonNull(p) && p.getStatus().equals(checkStatus)){
                 b = true;
             }
@@ -149,9 +143,7 @@ public class Game {
     }
 
     public void gradePlayers(String correctAnswer){
-        Player p;
-        for(int i = 0; i < 4; i++){
-            p = playerList[i];
+        for(Player p:playerMap.values()){
             if(Objects.nonNull(p) && p.getAnswer().equalsIgnoreCase(correctAnswer)){
                 p.setScore(p.getScore() + 1);
             }
@@ -159,9 +151,7 @@ public class Game {
     }
 
     public void transitionNextQuestion(){
-        Player p;
-        for(int i = 0; i < 4; i++){
-            p = playerList[i];
+        for(Player p:playerMap.values()){
             if(Objects.nonNull(p)){
                 while(p.getLocked().compareAndSet(false, true)){
 
@@ -183,9 +173,7 @@ public class Game {
     }
 
     public void transitionAnswer(){
-        Player p;
-        for(int i = 0; i < 4; i++){
-            p = playerList[i];
+        for(Player p:playerMap.values()){
             if(Objects.nonNull(p)){
                 while(p.getLocked().compareAndSet(false, true)){
 
