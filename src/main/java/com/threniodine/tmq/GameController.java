@@ -3,7 +3,10 @@ package com.threniodine.tmq;
 
 import java.util.ArrayList;
 
+import javax.crypto.spec.SecretKeySpec;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -13,7 +16,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.Claims;
+import java.security.Key;
+import java.util.Base64;
 
 @RestController
 public class GameController {
@@ -35,13 +45,45 @@ public class GameController {
 
     @CrossOrigin
     @PostMapping("/addPlayer/{gameId}")
-    public Integer addPlayer(@PathVariable Integer gameId, @RequestBody StringContainer stringContainer){
+    public String addPlayer(@PathVariable Integer gameId, @RequestBody StringContainer stringContainer){
+        String secret = "U0FMQURPRlNBTEFET0ZTQUxBRE9GU0FMQURPRlNBTEFET0ZTQUxBRE9GU0FMQURPRlNBTEFE";
+        Key hmacKey = new SecretKeySpec(Base64.getDecoder().decode(secret), 
+                                    SignatureAlgorithm.HS256.getJcaName());
+
         String playerName = stringContainer.payload;
-        return gameService.addPlayer(gameId, playerName);
+        Integer playerId = gameService.addPlayer(gameId, playerName);
+        String jwtToken = Jwts.builder().claim("gameId", gameId).claim("playerId", playerId)
+        .signWith(hmacKey).compact();
+        return jwtToken;
     }
 
+    @CrossOrigin
+    @PostMapping("/getPlayerId")
+    public Integer getPlayerId(@RequestBody StringContainer stringContainer){
+        String token = stringContainer.payload;
+        String secret = "U0FMQURPRlNBTEFET0ZTQUxBRE9GU0FMQURPRlNBTEFET0ZTQUxBRE9GU0FMQURPRlNBTEFE";
+        Key hmacKey = new SecretKeySpec(Base64.getDecoder().decode(secret), 
+                                    SignatureAlgorithm.HS256.getJcaName());
+
+        Jws<Claims> jwt = Jwts.parserBuilder()
+                .setSigningKey(hmacKey)
+                .build()
+                .parseClaimsJws(token);
+        Integer temp = jwt.getBody().get("playerId", Integer.class);
+        System.out.println(temp);
+        return temp;
+    }
+    /* 
+    @CrossOrigin
+    @PostMapping("/requestToken/{gameId}/{playerId}")
+    public String requestToken(@PathVariable Integer gameId, @PathVariable Integer playerId){
+        String jwtToken = Jwts.builder().claim("gameId", gameId).claim("playerId", playerId)
+        .signWith(new SecretKeySpec(Base64.getDecoder().decode("U0FMQURPRlNBTEFET0ZTQUxBRE9GU0FMQURPRlNBTEFET0ZTQUxBRE9GU0FMQURPRlNBTEFE"), SignatureAlgorithm.HS256.getJcaName())).compact();
+        return jwtToken;
+    }
+    */
     @MessageMapping("/addQuestionSet/{gameId}")
-    public Boolean addQuestionSet(QuestionSetContainer qsContainer, @DestinationVariable Integer gameId){
+    public void addQuestionSet(QuestionSetContainer qsContainer, @DestinationVariable Integer gameId){
         System.out.println(qsContainer.payload[0].url);
         QuestionContainer qContainer;
         ArrayList<Question> questionSet = new ArrayList<Question>();
@@ -49,17 +91,43 @@ public class GameController {
             qContainer = qsContainer.payload[i];
             questionSet.add(new Question(qContainer));
         }
-        return gameService.addQuestionSet(gameId, questionSet);
+        gameService.addQuestionSet(gameId, questionSet);
     }
 
     @MessageMapping("/updatePlayerAnswer/{gameId}/{playerId}")
-    public Boolean updatePlayerAnswer(StringContainer stringContainer, @DestinationVariable Integer gameId, @DestinationVariable Integer playerId){
-        return gameService.updatePlayerAnswer(gameId, playerId, stringContainer.payload);
+    public void updatePlayerAnswer(StringAuthContainer stringContainer, @DestinationVariable Integer gameId, @DestinationVariable Integer playerId){
+        String token = stringContainer.auth;
+        String secret = "U0FMQURPRlNBTEFET0ZTQUxBRE9GU0FMQURPRlNBTEFET0ZTQUxBRE9GU0FMQURPRlNBTEFE";
+        Key hmacKey = new SecretKeySpec(Base64.getDecoder().decode(secret), 
+                                    SignatureAlgorithm.HS256.getJcaName());
+
+        Jws<Claims> jwt = Jwts.parserBuilder()
+                .setSigningKey(hmacKey)
+                .build()
+                .parseClaimsJws(token);
+        Integer authPlayerId = jwt.getBody().get("playerId", Integer.class);
+        Integer authGameId = jwt.getBody().get("gameId", Integer.class);
+        if(gameId == authGameId && playerId == authPlayerId){
+            gameService.updatePlayerAnswer(gameId, playerId, stringContainer.payload);
+        }
     }
 
     @MessageMapping("/updatePlayerStatus/{gameId}/{playerId}")
-    public Boolean updatePlayerStatus(StringContainer stringContainer, @DestinationVariable Integer gameId, @DestinationVariable Integer playerId){
-        return gameService.updatePlayerStatus(gameId, playerId, stringContainer.payload);
+    public void updatePlayerStatus(StringAuthContainer stringContainer, @DestinationVariable Integer gameId, @DestinationVariable Integer playerId){
+        String token = stringContainer.auth;
+        String secret = "U0FMQURPRlNBTEFET0ZTQUxBRE9GU0FMQURPRlNBTEFET0ZTQUxBRE9GU0FMQURPRlNBTEFE";
+        Key hmacKey = new SecretKeySpec(Base64.getDecoder().decode(secret), 
+                                    SignatureAlgorithm.HS256.getJcaName());
+
+        Jws<Claims> jwt = Jwts.parserBuilder()
+                .setSigningKey(hmacKey)
+                .build()
+                .parseClaimsJws(token);
+        Integer authPlayerId = jwt.getBody().get("playerId", Integer.class);
+        Integer authGameId = jwt.getBody().get("gameId", Integer.class);
+        if(gameId == authGameId && playerId == authPlayerId){
+            gameService.updatePlayerStatus(gameId, playerId, stringContainer.payload);
+        }
     }
     /*
     @CrossOrigin(origins = "http://localhost:3000")
