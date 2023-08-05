@@ -18,7 +18,7 @@ public class Game {
 
     private Integer gameId;
     private String gameName;
-    private AtomicInteger nextPlayerId;
+    private Integer nextPlayerId;
     private Map<Integer, Player> playerMap;
     private AtomicBoolean playerMapLock;
     private ArrayList<Question> questionPool;
@@ -42,8 +42,10 @@ public class Game {
 
         this.timeKeeper = new TimeKeeper(this);
 
-        nextPlayerId = new AtomicInteger(0);
+        nextPlayerId = 0;
         playerMap = new HashMap<Integer,Player>();
+        playerMapLock = new AtomicBoolean(false);
+        
 
         questionPool = new ArrayList<Question>();
         questionPoolLock = new AtomicBoolean(false);
@@ -54,8 +56,21 @@ public class Game {
     }
 
     public Integer addPlayer(String playerName){
-        Integer temp = nextPlayerId.incrementAndGet();
+        while(playerMapLock.compareAndSet(false, true)){
+
+        }
+        for(Player p:playerMap.values()){
+            System.out.println(p.getName());
+            System.out.println(playerName);
+            if(p.getName().equals(playerName)){
+                System.out.println("same name");
+                return -1;
+            }
+        }
+        nextPlayerId++;
+        Integer temp = nextPlayerId;
         playerMap.put(temp,new Player(playerName, temp));
+        playerMapLock.compareAndSet(true, false);
         return temp;
     }
 
