@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.0.5</version>
+		<version>3.1.4</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.threniodine</groupId>
@@ -115,10 +115,10 @@
 			        <schemaVersion>v2</schemaVersion>
 			        <resourceGroup>tmq-rg</resourceGroup>
 			        <appName>thrensmusicquizgame</appName>
-			        <pricingTier>B1</pricingTier>
+			        <pricingTier>P1v2</pricingTier>
 					<appServicePlanResourceGroup>tmq-rg</appServicePlanResourceGroup>
           			<appServicePlanName>tmq-asp</appServicePlanName>
-			        <region>eastus</region>
+			        <region>westus2</region>
 			        <runtime>
 			            <os>Linux</os>
 			            <javaVersion>Java 17</javaVersion>
